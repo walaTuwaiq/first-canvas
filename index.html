@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GAME</title>
+    <script>
+      window.addEventListener("load", () => {
+        const canvasElem = document.getElementById("firstCanvas");
+        const xElem = document.getElementById("x");
+        const counting = document.getElementById("counting");
+
+        if (canvasElem.getContext) {
+          const ctx = canvasElem.getContext("2d");
+
+          const halfWidth = canvasElem.width / 2;
+          const halfHeight = canvasElem.height / 2;
+
+          //to begin player from center
+          let keydownX = halfWidth - 100;
+
+          let keydownY = halfHeight + 200;
+          let boxX = Math.floor(Math.random() * 1000);
+          let boxY = 0;
+          let count = 3;
+          counting.innerText = `Your count is: ${count}`;
+
+          canvasElem.addEventListener("mousemove", (event) => {
+            xElem.innerText = `X= ${event.clientX}, Y= ${event.clientY}`;
+          });
+
+          // CLICK event with draw points on canvas!
+          //   class Click {
+          //     constructor(x, y, radius, color, velocity) {
+          //       this.x = x;
+          //       this.y = y;
+          //       this.radius = radius;
+          //       this.color = color;
+          //       this.velocity = velocity;
+          //     }
+
+          //     draw() {
+          //       ctx.beginPath();
+          //       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+          //       ctx.fillStyle = this.color;
+          //       ctx.fill();
+          //     }
+          //   }
+
+          //   canvasElem.addEventListener("click", (event) => {
+          //     // console.log(event,event.clientY,event.clientX);
+          //     let y = halfHeight + 200;
+          //     if (event.clientY < y) {
+          //       const clickPoint = new Click(
+          //         event.clientX,
+          //         event.clientY,
+          //         5,
+          //         "red",
+          //         null
+          //       );
+          //       clickPoint.draw();
+          //     }
+          //   });
+
+          ctx.fillStyle = "blue";
+          ctx.fillRect(keydownX, keydownY, 150, 10);
+
+          const changePlayerPlace = (event) => {
+            if (event.key == "ArrowRight") {
+              if (keydownX < 800) {
+                ctx.clearRect(keydownX, keydownY, 150, 10);
+                //move player to right 30Degree
+                keydownX += 30;
+                ctx.fillStyle = "blue";
+                ctx.fillRect(keydownX, keydownY, 150, 10);
+              }
+            } else if (event.key == "ArrowLeft") {
+              if (keydownX > 75) {
+                ctx.clearRect(keydownX, keydownY, 150, 10);
+                //move player to left 30Degree
+                keydownX -= 30;
+                ctx.fillStyle = "blue";
+                ctx.fillRect(keydownX, keydownY, 150, 10);
+              }
+            }
+          };
+          window.addEventListener("keydown", changePlayerPlace);
+
+          const firstBox = () => {
+            setInterval(() => {
+              // To clear pervious box
+              ctx.clearRect(boxX, boxY - 20, 30, 30);
+
+              // To Stop box in right point
+              if (boxY < keydownY - 15 && boxX > 175 && boxX < 675) {
+                ctx.fillStyle = "red";
+                ctx.fillRect(boxX, boxY, 30, 30);
+                boxY += 20;
+              } else {
+                boxY = 0;
+                let randomX = Math.floor(Math.random() * 1000);
+                let calculateRangeX = boxX + randomX;
+
+                if (calculateRangeX > 175 && calculateRangeX < 675) {
+                  boxX = calculateRangeX;
+                } else if (calculateRangeX > 675) {
+                  boxX = 175;
+                  randomX = Math.floor(Math.random() * 1000);
+                  calculateRangeX = boxX + randomX;
+                  if (calculateRangeX < 675) {
+                    boxX = calculateRangeX;
+                  }
+                } else {
+                  randomX = Math.floor(Math.random() * 1000);
+                  boxX = calculateRangeX;
+                }
+              }
+
+              if (boxY == 500 && count >= 1) {
+                count = count - 1;
+                counting.innerText = `Your count is: ${count}`;
+              }
+
+              if (count == 0) {
+                ctx.clearRect(0, 0, 1000, 600);
+                ctx.font = "150px Arial";
+                ctx.strokeText("GAME OVER", 7, 400);
+                window.removeEventListener("keydown", changePlayerPlace);
+                window.removeEventListener("keydown", fireKey);
+              }
+            }, 100);
+          };
+
+          firstBox();
+
+          const fireKey = (event) => {
+            if (event.code == "Space") {
+              let spaceKeyX = keydownX + 73;
+              let spaceKeyY = keydownY - 10;
+              setInterval(() => {
+                if (spaceKeyY > -70) {
+                  ctx.fillStyle = "orange";
+                  ctx.fillRect(spaceKeyX, spaceKeyY, 10, 10);
+
+                  // to clear fire after player
+                  if (spaceKeyY < 490) {
+                    ctx.clearRect(spaceKeyX, spaceKeyY + 60, 10, 10);
+                  }
+                  spaceKeyY -= 20;
+                  let xBoxPlus = boxX + 30;
+                  let yBoxPlus = boxY + 30;
+                }
+                if (
+                  spaceKeyX >= boxX
+                  // spaceKeyX >=
+                  // boxX - 10
+                  //   &&
+                  //   spaceKeyX < xBoxPlus + 10 &&
+                  //   spaceKeyY < yBoxPlus
+                ) {
+                  //   ctx.fillRect(boxX - 10, yBoxPlus - 10, 80, 50);
+                  console.log("DONE");
+                  return;
+                }
+              }, 50);
+            }
+          };
+          window.addEventListener("keydown", fireKey);
+
+          // setInterval(() => {
+          //     ctx.clearRect(boxX,boxY-20,30,30)
+          //     if(boxY < keydownY-30){
+          //         ctx.fillStyle= "red";
+          //         ctx.fillRect(boxX,boxY,30,30);
+          //         // if(boxX == keydownX){
+          //         //     alert("Game Over");
+          //         //     return
+          //         // }
+          //         boxY+=20
+          //     } else{
+          //         boxY=0
+          //         let randomX = Math.floor(Math.random()*100) ;
+          //         let calculateRangeX = boxX + randomX;
+          //         console.log(calculateRangeX,"calculateX");
+          //         console.log(boxX,"boxx");
+
+          //         if(calculateRangeX > 100 && calculateRangeX < 750){
+          //             boxX=calculateRangeX;
+          //         } else{
+          //             randomX = Math.floor(Math.random()*100) ;
+          //             boxX=calculateRangeX;
+          //         }
+          //     }
+
+          // }, 100);
+
+          // ctx.beginPath();
+          // ctx.moveTo(30,30);
+          // ctx.lineTo(150,30);
+          // ctx.lineTo(90,200);
+          // ctx.closePath()
+          // ctx.fillStyle = "coral";
+          // ctx.fill();
+
+          // ctx.beginPath();
+          // ctx.moveTo(200,200);
+          // ctx.lineTo(320,200);
+          // ctx.lineTo(260,30);
+          // ctx.closePath();
+          // ctx.strokeStyle = "coral";
+          // ctx.stroke();
+
+          // ctx.strokeStyle= "#DCC4C4";
+          // ctx.fillStyle = "#DCC4C4";
+          // ctx.lineWidth = 0.5;
+          // ctx.fillRect(30,30,120,120);
+          // ctx.strokeRect(30,30,120,120);
+
+          // ctx.fillStyle = "#C1A0A0";
+          // ctx.fillRect(60,50,20,20);
+
+          // ctx.fillStyle = "#C1A0A0";
+          // ctx.fillRect(100,50,20,20);
+
+          // ctx.strokeStyle= "#C1A0A0";
+          // ctx.lineWidth = 0.5;
+          // ctx.strokeRect(50,100,80,15);
+
+          // ctx.beginPath();
+          // ctx.moveTo(70,70);
+          // ctx.lineTo(70,100);
+          // ctx.stroke();
+
+          // ctx.strokeStyle= "red";
+          // ctx.fillStyle = "#A52A2A";
+          // ctx.lineWidth = 0.5;
+          // ctx.fillRect(10,10,120,80);
+          // ctx.strokeRect(10,10,120,80);
+
+          // ctx.beginPath();
+          // ctx.moveTo(100,100);
+          // ctx.lineTo(100,160);
+          // ctx.stroke();
+
+          // ctx.beginPath();
+          // ctx.moveTo(150,100);
+          // ctx.lineTo(100,160);
+          // ctx.stroke();
+
+          // ctx.beginPath();
+          // ctx.moveTo(150,100);
+          // ctx.lineTo(100,160);
+          // ctx.stroke();
+
+          // ctx.beginPath();
+          // ctx.moveTo(100,100);
+          // ctx.lineTo(100,150);
+
+          // ctx.moveTo(100,100);
+          // ctx.lineTo(150,150);
+
+          // ctx.moveTo(150,150);
+          // ctx.lineTo(100,150);
+          // ctx.stroke();
+
+          // ctx.beginPath();
+          // ctx.moveTo(50,100);
+          // ctx.lineTo(25,150);
+          // ctx.lineTo(75,150);
+          // ctx.lineTo(50,100);
+          // ctx.stroke();
+        }
+      });
+    </script>
+
+    <style>
+      #firstCanvas {
+        border: 1px solid #a52a2a6b;
+        /* border-radius: 1rem; */
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="firstCanvas" height="600" width="1000"></canvas>
+    <h3 id="x"></h3>
+    <h4 id="counting"></h4>
+  </body>
+</html>
